@@ -1,0 +1,4 @@
+streamlit==1.27.0
+langchain==0.1.0
+chromadb==0.4.8
+ollama==0.0.5
