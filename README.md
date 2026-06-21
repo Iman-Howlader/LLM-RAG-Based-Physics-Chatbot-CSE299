@@ -1,88 +1,71 @@
-<div align="center">
+# Document Q&A Website
 
-# 🎓 PhyChat — Local RAG Physics Chatbot
-
-<!-- Add a demo screenshot or GIF here later -->
-
-**Ask a physics question. Get an answer grounded in the textbook — not a guess.**
-
-100% local RAG chatbot. No API key, no cloud cost, no internet required at inference time — the LLM, the embeddings, and the vector store all run on your own machine via [Ollama](https://ollama.com/).
-
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-UI-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![LangChain](https://img.shields.io/badge/LangChain-RAG-1C3C3C)](https://www.langchain.com/)
-[![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-000000?logo=ollama&logoColor=white)](https://ollama.com/)
-
-</div>
-
----
-
-## Why this exists
-
-Most chatbots answer physics questions whether or not they actually know the syllabus — a confident wrong answer is worse than no answer. PhyChat's prompt hard-constrains the model: if the answer isn't in the textbook chunks it retrieved, it says so instead of guessing from general knowledge.
-
-## How it works
-
-```
-PDF → split into chunks → embed (bge-m3) → Chroma vector store (persisted once)
-                                                      │
-question → MMR retrieve top-3 chunks → prompt (context + memory) → Ollama (mistral) → answer
-                                                                          │
-                                                          LaTeX in $...$ rendered as real math
-```
-
-The vector store is built **once** and cached to disk in `vectorDB/` — a fresh clone of this repo already includes a prebuilt index, so it works immediately.
+This repository contains a FastAPI backend and a simple frontend for uploading documents and asking questions about them.
 
 ## Features
 
-- 🔒 Refuses to answer outside the textbook's content
-- 🖥️ Fully local — zero API key, zero per-token cost
-- 🧠 Conversational memory within a session
-- 💾 Persistent vector index — instant startup after the first run
-- 🧮 Renders LaTeX formulas as real math, not raw text
+- Upload multiple documents at once
+- Support for PDF, TXT, MD, HTML, DOCX, CSV, XLSX, and PPTX
+- Stores documents in-memory per browser session using a session ID
+- Uses embeddings and similarity search to answer questions from uploaded content
+- Returns a polite fallback response when the answer is not found in uploaded documents
+
+## Files
+
+- `app.py` - FastAPI backend that loads documents, builds a Chroma vector store, and serves the chatbot API
+- `index.html` - Frontend interface for uploading files, entering the Groq API key, and chatting
+- `requirements.txt` - Python dependencies
 
 ## Setup
 
-```bash
-git clone https://github.com/Iman-Howlader/LLM-RAG-Based-Physics-Chatbot-CSE299.git
-cd LLM-RAG-Based-Physics-Chatbot-CSE299
-python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
-pip install -r requirements.txt langchain-community pypdf   # both needed, missing from requirements.txt
+1. Create and activate a Python virtual environment.
+
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+2. Install dependencies.
+
+   ```powershell
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+   ```
+
+## Run the app
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn app:app --reload
 ```
 
-Pull the models and make sure Ollama is running:
-```bash
-ollama pull mistral
-ollama pull bge-m3
-ollama serve
-```
+Open your browser and go to:
 
-## Run it
+- `http://127.0.0.1:8000`
 
-```bash
-streamlit run app.py
-```
+or
 
-Opens at `http://localhost:8501`. Try: *"What is Newton's second law of motion?"*
+- `http://localhost:8000`
 
-## Using your own PDF
+## Usage
 
-Replace `pdfFiles/Physics-class10.pdf` (or change `PDF_PATH` in `app.py`), then **delete the `vectorDB/` folder** — it only rebuilds when that folder is missing/empty, so skipping this step silently keeps querying the old textbook.
+1. Enter your Groq API key in the sidebar.
+2. Upload one or more supported documents.
+3. Ask a question in the chat input.
+4. If the question is not covered by uploaded documents, the app will respond with a fallback message.
+## Login Portal
 
-## Known limitations
+- Use the sidebar to register a new email and password.
+- Log in to get a session token that keeps your uploads and chat history separate.
+- Uploads and chat are protected per account.
+- Use `Logout` to end the session.
+## Notes
 
-- One PDF at a time, no multi-document ingestion
-- No source citations shown in the UI (chain supports it, just not wired in)
-- No streaming responses; memory resets on restart
-- `requirements.txt` is missing `langchain-community` and `pypdf` (see Setup above)
-- PDF + Chroma DB committed directly to git, no `.gitignore`, no license file
+- The app currently uses an in-memory storage approach. Restarting the backend clears all uploaded data.
+- In production, update CORS origins and do not allow `*` for security.
+- If you add more file formats, update `app.py` in `load_single_file()`.
 
-## License
+## Troubleshooting
 
-None yet — [MIT](https://choosealicense.com/licenses/mit/) is a reasonable default to add.
-
----
-
-<div align="center">
-A CSE299 project — proving an LLM can be useful for studying <em>without</em> making things up.
-</div>
+- If files fail to upload, check the browser console and backend logs.
+- Ensure your Groq API key is valid and entered correctly.
+- Make sure `uvicorn` is running before using the frontend.
+- If package install fails on Python 3.14, remove `pysqlite3-binary` from `requirements.txt` (already removed in this repo).

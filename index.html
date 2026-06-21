@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiDoc AI • Premium Document Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f8faff;
+      --surface: #ffffff;
+      --surface-strong: #f1f5f9;
+      --text: #111827;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-strong: #1d4ed8;
+      --secondary: #1e293b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+      --radius: 28px;
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 28%),
+                  radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.1), transparent 24%),
+                  var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+      gap: 24px;
+      padding: 24px;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      padding: 28px;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid rgba(226,232,240,0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.2);
+    }
+
+    .brand-title { display: grid; gap: 4px; }
+    .brand-title strong { font-size: 1.05rem; letter-spacing: -0.03em; }
+    .brand-title span { color: var(--muted); font-size: 0.95rem; }
+
+    .nav-list { display: grid; gap: 10px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      color: var(--secondary);
+      text-decoration: none;
+      transition: all 180ms ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--primary);
+      border-color: rgba(37, 99, 235, 0.16);
+    }
+
+    .sidebar-footer { display: grid; gap: 12px; }
+    .theme-switcher {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(226,232,240,0.85);
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      box-shadow: 0 20px 50px rgba(15,23,42,0.06);
+    }
+
+    .search-field {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: var(--surface-strong);
+      border: 1px solid var(--border);
+    }
+
+    .search-field input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      outline: none;
+      color: var(--secondary);
+    }
+
+    .top-actions { display: flex; align-items: center; gap: 14px; }
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+      color: var(--secondary);
+      transition: all 180ms ease;
+    }
+
+    .icon-btn:hover { transform: translateY(-1px); border-color: rgba(37,99,235,0.2); }
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(226,232,240,0.9);
+      background: var(--surface-strong);
+    }
+
+    .user-pill span { color: var(--secondary); }
+    .content { display: grid; gap: 24px; }
+    .row-grid { display: grid; gap: 24px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(226,232,240,0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .section-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: rgba(37,99,235,0.14);
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+
+    .settings-card {
+      display: grid;
+      gap: 20px;
+      min-height: 320px;
+    }
+
+    .settings-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .chat-header {
+      border-bottom: 1px solid rgba(226,232,240,0.9);
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+    }
+
+    .chat-bottom {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .chat-suggestions {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .suggested-label {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .chat-input {
+      display: grid;
+      gap: 12px;
+    }
+
+    .send-button {
+      width: 140px;
+      justify-self: end;
+    }
+
+    .field-group label {
+      display: block;
+    }
+
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .field-group input[type="range"] {
+      width: 100%;
+    }
+
+    .chat-container {
+      display: grid;
+      gap: 18px;
+    }
+
+    .messages-panel {
+      display: grid;
+      gap: 14px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .message-bubble {
+      max-width: 82%;
+      padding: 18px 20px;
+      border-radius: 24px;
+      line-height: 1.7;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.05);
+    }
+
+    .message-user { margin-left: auto; background: linear-gradient(135deg, rgba(37,99,235,0.95), rgba(37,99,235,0.8)); color: white; border-bottom-right-radius: 6px; }
+    .message-ai { background: #f8fafc; color: var(--secondary); border-bottom-left-radius: 6px; }
+
+    .chat-input textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: 22px;
+      border: 1px solid rgba(226,232,240,0.95);
+      padding: 18px 20px;
+      resize: vertical;
+      background: var(--surface-strong);
+      color: var(--secondary);
+    }
+
+    .send-button {
+      padding: 14px 22px;
+    }
+
+    .settings-card .field-group {
+      display: grid;
+      gap: 18px;
+    }
+
+    .settings-card .toggle-row {
+      align-items: center;
+    }
+
+    .section-title h3 {
+      margin: 0;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .bubble-pill {
+      min-width: 180px;
+    }
+
+    .chat-suggestions .bubble-pill {
+      width: auto;
+    }
+
+    .settings-actions .btn {
+      min-width: 140px;
+    }
+
+    .settings-card button {
+      width: 100%;
+    }
+
+    .chat-bottom .chat-input {
+      align-items: end;
+    }
+
+    @media (max-width: 820px) {
+      .send-button {
+        width: 100%;
+      }
+    }
+
+    .stat-card { display: grid; gap: 16px; }
+    .stat-card-header { display: flex; align-items: center; justify-content: space-between; }
+    .stat-card-header h3 { margin: 0; color: var(--muted); font-size: 0.98rem; }
+    .stat-value { font-size: 2.3rem; font-weight: 700; color: var(--secondary); margin: 0; }
+    .stat-meta { display: inline-flex; align-items: center; gap: 8px; color: var(--success); font-weight: 600; }
+
+    .hero-panel { display: grid; gap: 20px; }
+    .hero-panel h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.02; letter-spacing: -0.03em; }
+    .hero-panel p { margin: 0; color: var(--muted); font-size: 1rem; max-width: 58ch; }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 22px;
+      font-weight: 600;
+      transition: all 180ms ease;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-strong); }
+    .btn-secondary { background: transparent; border: 1px solid rgba(37,99,235,0.2); color: var(--secondary); }
+    .btn-secondary:hover { background: rgba(37,99,235,0.08); }
+
+    .bubble-list { display: grid; gap: 14px; }
+    .bubble-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(226,232,240,0.9);
+      background: var(--surface-strong);
+      color: var(--secondary);
+      transition: transform 180ms ease;
+    }
+
+    .bubble-pill:hover { transform: translateY(-1px); }
+    .upload-panel { display: grid; gap: 18px; }
+    .upload-dropzone {
+      position: relative;
+      min-height: 220px;
+      border: 2px dashed rgba(37,99,235,0.35);
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      background: rgba(37,99,235,0.05);
+      text-align: center;
+      padding: 32px;
+      transition: border-color 180ms ease, background 180ms ease;
+    }
+
+    .upload-dropzone:hover { background: rgba(37,99,235,0.08); border-color: rgba(37,99,235,0.6); }
+    .upload-dropzone input[type=file] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+    .upload-dropzone h3 { margin: 0; font-size: 1.2rem; }
+    .upload-dropzone p { margin: 8px 0 0; color: var(--muted); }
+
+    .doc-grid { display: grid; gap: 18px; }
+    .doc-card {
+      border-radius: 24px;
+      padding: 20px;
+      border: 1px solid rgba(226,232,240,0.9);
+      background: var(--surface);
+      display: grid;
+      gap: 14px;
+    }
+
+    .doc-card-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .doc-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: rgba(37,99,235,0.08); color: var(--primary); font-weight: 600; }
+    .doc-meta { display: grid; gap: 8px; font-size: 0.95rem; color: var(--muted); }
+    .doc-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .doc-action {
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(226,232,240,0.9);
+      background: var(--surface-strong);
+      color: var(--secondary);
+      font-size: 0.95rem;
+    }
+
+    .chat-container { display: grid; gap: 18px; }
+    .messages-panel {
+      display: grid;
+      gap: 14px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .message-bubble {
+      max-width: 82%;
+      padding: 18px 20px;
+      border-radius: 24px;
+      line-height: 1.7;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.05);
+    }
+
+    .message-user { margin-left: auto; background: linear-gradient(135deg, rgba(37,99,235,0.95), rgba(37,99,235,0.8)); color: white; border-bottom-right-radius: 6px; }
+    .message-ai { background: #f8fafc; color: var(--secondary); border-bottom-left-radius: 6px; }
+    .message-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .message-actions button { border: 1px solid rgba(226,232,240,0.9); background: white; padding: 8px 12px; border-radius: 14px; color: var(--secondary); font-size: 0.88rem; }
+
+    .chat-input { display: grid; gap: 14px; }
+    .chat-input textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: 22px;
+      border: 1px solid rgba(226,232,240,0.95);
+      padding: 18px 20px;
+      resize: vertical;
+      background: var(--surface-strong);
+      color: var(--secondary);
+    }
+
+    .chat-input-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+    .quick-actions { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    .quick-action {
+      padding: 16px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(226,232,240,0.9);
+      background: var(--surface-strong);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .quick-action span { color: var(--secondary); font-weight: 600; }
+    .history-list { display: grid; gap: 16px; }
+    .history-card {
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(226,232,240,0.9);
+      background: var(--surface);
+      display: grid;
+      gap: 10px;
+    }
+
+    .history-card h4 { margin: 0; font-size: 1rem; }
+    .history-meta { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 0.92rem; }
+    .history-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .settings-panel { display: grid; gap: 20px; }
+    .settings-section { display: grid; gap: 14px; }
+    .settings-section h3 { margin: 0; }
+    .field-group { display: grid; gap: 10px; }
+    label { display: grid; gap: 8px; color: var(--secondary); font-size: 0.95rem; }
+    input, select { width: 100%; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(226,232,240,0.95); background: #fff; color: var(--secondary); }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-radius: 20px; background: var(--surface-strong); border: 1px solid rgba(226,232,240,0.9); }
+
+    .hidden { display: none !important; }
+    .small-text { color: var(--muted); font-size: 0.95rem; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; }
+    .badge-success { background: rgba(16,185,129,0.12); color: var(--success); }
+    .badge-warning { background: rgba(245,158,11,0.12); color: var(--yellow); }
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      min-width: 320px;
+      padding: 16px 20px;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      background: rgba(255,255,255,0.98);
+      border: 1px solid rgba(226,232,240,0.95);
+      z-index: 50;
+      display: grid;
+      gap: 8px;
+    }
+
+    .toast.success { border-color: rgba(16,185,129,0.3); }
+    .toast.error { border-color: rgba(239,68,68,0.3); }
+    .toast strong { font-weight: 700; }
+
+    @media (max-width: 1100px) {
+      .app-shell { grid-template-columns: 1fr; padding: 18px; }
+      .sidebar { position: relative; top: auto; }
+    }
+
+    @media (max-width: 820px) {
+      .topbar { flex-wrap: wrap; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .app-shell { gap: 18px; padding: 16px; }
+      .sidebar { padding: 22px; }
+    }
+
+    @media (max-width: 640px) {
+      .sidebar, .topbar, .card { border-radius: 24px; }
+      .app-shell { padding: 12px; }
+      .nav-item { padding: 12px 14px; }
+      .search-field { width: 100%; }
+      .btn { width: 100%; }
+      .top-actions { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">MD</div>
+        <div class="brand-title">
+          <strong>MultiDoc AI</strong>
+          <span>Document intelligence platform</span>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:12px;" onclick="newChat()">New Chat</button>
+
+      <nav class="nav-list" aria-label="Primary navigation">
+        <a href="#" class="nav-item active" data-view="dashboard">Dashboard</a>
+        <a href="#" class="nav-item" data-view="documents">Documents</a>
+        <a href="#" class="nav-item" data-view="chat">AI Chat</a>
+        <a href="#" class="nav-item" data-view="history">Chat History</a>
+        <a href="#" class="nav-item" data-view="analytics">Analytics</a>
+        <a href="#" class="nav-item" data-view="settings">Settings</a>
+        <a href="#" class="nav-item" data-view="logout">Logout</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="theme-switcher">
+          <span>Dark Mode</span>
+          <label style="display:inline-flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="theme-toggle" />
+            <span style="display:inline-block;width:40px;height:20px;border-radius:999px;background:#e2e8f0;position:relative;"></span>
+          </label>
+        </div>
+        <div id="auth-actions" style="display:grid;gap:10px;"></div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="topbar">
+        <div class="search-field">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.5 18a7.5 7.5 0 1 1 5.36-2.18l5.17 5.17a1 1 0 0 1-1.42 1.42l-5.17-5.17A7.46 7.46 0 0 1 10.5 18Zm0-13a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z" fill="currentColor"/></svg>
+          <input id="search-documents" type="search" placeholder="Search documents, chats or insights" />
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" title="Notifications">🔔</button>
+          <div class="user-pill"><span id="profile-name">Guest</span></div>
+        </div>
+      </section>
+
+      <section id="landing-view" class="card hero-panel">
+        <div>
+          <h1>Chat with Your Documents Using AI</h1>
+          <p>Upload PDFs, DOCX files, research papers, and notes. Ask questions, generate summaries, and discover insights instantly.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="showApp()">Get Started</button>
+            <button class="btn btn-secondary" onclick="setActiveNav('chat')">Watch Demo</button>
+          </div>
+        </div>
+        <div class="bubble-list">
+          <div class="bubble-pill">Upload multiple documents</div>
+          <div class="bubble-pill">Chat with your content</div>
+          <div class="bubble-pill">Summaries, citations, and insights</div>
+        </div>
+      </section>
+
+      <section id="app-view" class="content" hidden>
+        <div class="row-grid grid-3">
+          <article class="card stat-card">
+            <div class="stat-card-header"><h3>Total Uploaded Documents</h3><span>Live</span></div>
+            <p class="stat-value" id="stat-documents">0</p>
+          </article>
+          <article class="card stat-card">
+            <div class="stat-card-header"><h3>Total Chunks Indexed</h3><span>AI</span></div>
+            <p class="stat-value" id="stat-chunks">0</p>
+          </article>
+          <article class="card stat-card">
+            <div class="stat-card-header"><h3>Total Questions Asked</h3><span>Usage</span></div>
+            <p class="stat-value" id="stat-questions">0</p>
+          </article>
+        </div>
+
+        <section id="dashboard" class="content-section">
+          <div class="row-grid grid-2">
+            <article class="card upload-panel">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                <div>
+                  <h3>Upload Documents</h3>
+                  <p class="small-text">Supported formats: PDF, DOCX, TXT, PPTX, XLSX, CSV</p>
+                </div>
+                <button class="btn btn-primary" onclick="triggerUpload()">Upload Files</button>
+              </div>
+              <label class="upload-dropzone" for="file-picker">
+                <div>
+                  <div style="font-size:3rem;">📄</div>
+                  <h3>Drag & drop files here</h3>
+                  <p>or click to browse your device</p>
+                </div>
+                <input type="file" id="file-picker" multiple onchange="uploadFiles()" />
+              </label>
+              <div id="upload-status" class="small-text">No uploads yet. Login first to start indexing documents.</div>
+            </article>
+            <article class="card quick-actions">
+              <div class="quick-action"><span>Summarize Document</span>→</div>
+              <div class="quick-action"><span>Generate Questions</span>→</div>
+              <div class="quick-action"><span>Generate MCQs</span>→</div>
+              <div class="quick-action"><span>Extract Authors</span>→</div>
+              <div class="quick-action"><span>Generate Slides</span>→</div>
+              <div class="quick-action"><span>Literature Review</span>→</div>
+              <div class="quick-action"><span>Citation Generator</span>→</div>
+              <div class="quick-action"><span>Key Findings</span>→</div>
+            </article>
+          </div>
+          <article class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+              <div>
+                <h3>Suggested Questions</h3>
+                <p class="small-text">Get started quickly after uploading a document.</p>
+              </div>
+            </div>
+            <div class="bubble-list" id="suggested-questions">
+              <button class="bubble-pill" onclick="handleSuggested('Summarize this document')">Summarize this document</button>
+              <button class="bubble-pill" onclick="handleSuggested('Who are the authors?')">Who are the authors?</button>
+              <button class="bubble-pill" onclick="handleSuggested('What is the methodology?')">What is the methodology?</button>
+              <button class="bubble-pill" onclick="handleSuggested('What are the key findings?')">What are the key findings?</button>
+              <button class="bubble-pill" onclick="handleSuggested('Generate presentation slides')">Generate presentation slides</button>
+              <button class="bubble-pill" onclick="handleSuggested('Generate exam questions')">Generate exam questions</button>
+            </div>
+          </article>
+        </section>
+
+        <section id="documents" class="content-section hidden">
+          <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+            <div>
+              <h3>Document Library</h3>
+              <p class="small-text">Manage uploads, re-index content, and review document metadata.</p>
+            </div>
+            <button class="btn btn-secondary" onclick="triggerUpload()">Add Document</button>
+          </div>
+          <div id="documents-grid" class="doc-grid"></div>
+        </section>
+
+        <section id="chat" class="content-section hidden">
+          <div class="card chat-container">
+            <div class="chat-header">
+              <div class="section-title">
+                <span class="section-icon">💬</span>
+                <div>
+                  <h3>AI Chat Assistant</h3>
+                  <p class="small-text">Ask questions across uploaded documents and receive answers with citations.</p>
+                </div>
+              </div>
+            </div>
+            <div class="messages-panel" id="chat-messages">
+              <div class="message-bubble message-ai">Welcome! Upload a document and start your first conversation.</div>
+            </div>
+            <div class="chat-bottom">
+              <div class="suggested-label"><strong>Suggested questions</strong></div>
+              <div class="bubble-list chat-suggestions" id="chat-suggested-questions">
+                <button class="bubble-pill" onclick="handleSuggested('Summarize this document')">Summarize this document</button>
+                <button class="bubble-pill" onclick="handleSuggested('Who are the authors?')">Who are the authors?</button>
+                <button class="bubble-pill" onclick="handleSuggested('What is the methodology?')">What is the methodology?</button>
+                <button class="bubble-pill" onclick="handleSuggested('What are the key findings?')">What are the key findings?</button>
+              </div>
+              <div class="chat-input">
+                <textarea id="user-input" placeholder="Type your question here..." rows="4"></textarea>
+                <button class="btn btn-primary send-button" onclick="sendMessage()">Send</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="history" class="content-section hidden">
+          <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+            <div>
+              <h3>Chat History</h3>
+              <p class="small-text">Browse previous conversations for faster research.</p>
+            </div>
+            <button class="btn btn-secondary" onclick="clearHistory()">Clear History</button>
+          </div>
+          <div class="history-list" id="history-list"></div>
+        </section>
+
+        <section id="analytics" class="content-section hidden">
+          <div class="row-grid grid-2">
+            <article class="card">
+              <h3>Insights</h3>
+              <p class="small-text">Document usage, chat volume, and content coverage at a glance.</p>
+              <div style="margin-top:18px;display:grid;gap:12px;">
+                <div style="display:flex;justify-content:space-between;"><span>Documents indexed</span><strong id="analytics-documents">0</strong></div>
+                <div style="display:flex;justify-content:space-between;"><span>Questions answered</span><strong id="analytics-questions">0</strong></div>
+                <div style="display:flex;justify-content:space-between;"><span>Average response time</span><strong>1.4s</strong></div>
+              </div>
+            </article>
+            <article class="card">
+              <h3>Storage Usage</h3>
+              <p class="small-text">Your indexed document storage status.</p>
+              <div style="margin-top:18px;"><div style="height: 12px; width: 100%; background: var(--surface-strong); border-radius: 999px;"><div id="storage-bar" style="width: 24%; height:100%; background: var(--primary); border-radius: 999px;"></div></div>
+                <p class="small-text" style="margin-top:10px;">24% of 10 GB used</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="settings" class="content-section hidden">
+          <div class="row-grid grid-2">
+            <article class="card settings-card">
+              <div class="section-title">
+                <span class="section-icon">⚙️</span>
+                <div>
+                  <h3>AI Configuration</h3>
+                  <p class="small-text">Control your model, embedding settings, and request behavior.</p>
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Groq API Key<input type="password" id="settings-api-key" placeholder="Enter your API key" /></label>
+                <label>Model selection<select id="settings-model-name"><option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option><option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option></select></label>
+                <label>Embedding model<select id="settings-embed-model"><option value="sentence-transformers/all-MiniLM-L6-v2">all-MiniLM-L6-v2</option><option value="sentence-transformers/bert-base-nli-stsb-mean-tokens">BERT NLI</option></select></label>
+                <label>Temperature<input type="range" id="settings-temperature" min="0" max="1" step="0.05" value="0.1" /></label>
+                <label>Max tokens<input type="number" id="settings-max-tokens" min="64" max="4096" step="64" value="1024" /></label>
+              </div>
+              <div class="settings-actions">
+                <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+                <button class="btn btn-secondary" onclick="testConnection()">Test Connection</button>
+              </div>
+            </article>
+            <article class="card settings-card">
+              <div class="section-title">
+                <span class="section-icon">🧩</span>
+                <div>
+                  <h3>User Preferences</h3>
+                  <p class="small-text">Customize your workspace style and locale.</p>
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Theme selection<select id="settings-theme-select"><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label>
+                <label>Font size<select id="settings-font-size"><option value="14">Small</option><option value="16">Default</option><option value="18">Large</option><option value="20">Extra Large</option></select></label>
+                <label>Language<select id="settings-language"><option value="en">English</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option></select></label>
+              </div>
+              <div class="toggle-row">
+                <span>Dark Mode</span>
+                <input type="checkbox" id="settings-dark-mode" />
+              </div>
+            </article>
+          </div>
+          <article class="card settings-card">
+            <div class="section-title">
+              <span class="section-icon">🔒</span>
+              <div>
+                <h3>Security</h3>
+                <p class="small-text">Manage access controls and active sessions.</p>
+              </div>
+            </div>
+            <div class="field-group">
+              <button class="btn btn-secondary" onclick="changePassword()">Change Password</button>
+              <button class="btn btn-secondary" onclick="logoutAllDevices()">Logout All Devices</button>
+            </div>
+          </article>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast hidden"><strong id="toast-title"></strong><p id="toast-text"></p></div>
+
+  <script>
+    const BACKEND_URL = 'http://localhost:8000';
+    let authToken = localStorage.getItem('authToken');
+    let authEmail = localStorage.getItem('authEmail');
+    let currentView = 'dashboard';
+    let uploadedFiles = [];
+    let chatHistory = [];
+    let userSettings = {};
+    const defaultSettings = {
+      apiKey: '',
+      modelName: 'llama-3.3-70b-versatile',
+      embedModel: 'sentence-transformers/all-MiniLM-L6-v2',
+      temperature: 0.1,
+      maxTokens: 1024,
+      theme: 'system',
+      fontSize: '16',
+      language: 'en',
+      darkMode: false,
+    };
+
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = {
+      dashboard: document.getElementById('dashboard'),
+      documents: document.getElementById('documents'),
+      chat: document.getElementById('chat'),
+      history: document.getElementById('history'),
+      analytics: document.getElementById('analytics'),
+      settings: document.getElementById('settings'),
+    };
+    const appView = document.getElementById('app-view');
+    const landingView = document.getElementById('landing-view');
+
+    function updateAuthStatus(message) {
+      document.getElementById('profile-name').textContent = authEmail || 'Guest';
+      showToast('Status', message, 'success');
+    }
+
+    function saveAuth(token, email) {
+      authToken = token;
+      authEmail = email;
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('authEmail', email);
+      updateAuthStatus(`Logged in as ${email}`);
+      renderAuthActions();
+      showApp();
+    }
+
+    function clearAuth() {
+      authToken = null;
+      authEmail = null;
+      uploadedFiles = [];
+      chatHistory = [];
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authEmail');
+      document.getElementById('profile-name').textContent = 'Guest';
+      renderAuthActions();
+      renderDocuments();
+      renderHistory();
+      renderStats();
+      showLanding();
+    }
+
+    function renderAuthActions() {
+      const authActions = document.getElementById('auth-actions');
+      authActions.innerHTML = '';
+      if (authToken && authEmail) {
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'btn btn-secondary';
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.onclick = handleLogout;
+        authActions.appendChild(logoutBtn);
+      } else {
+        const loginBtn = document.createElement('button');
+        loginBtn.className = 'btn btn-primary';
+        loginBtn.textContent = 'Login';
+        loginBtn.onclick = loginUser;
+        const registerBtn = document.createElement('button');
+        registerBtn.className = 'btn btn-secondary';
+        registerBtn.textContent = 'Register';
+        registerBtn.onclick = registerUser;
+        authActions.appendChild(loginBtn);
+        authActions.appendChild(registerBtn);
+      }
+    }
+
+    function loadSettings() {
+      const stored = localStorage.getItem('multiDocSettings');
+      userSettings = stored ? JSON.parse(stored) : { ...defaultSettings };
+      userSettings = { ...defaultSettings, ...userSettings };
+      applySettingsToUI();
+      return userSettings;
+    }
+
+    function applySettingsToUI() {
+      const apiInput = document.getElementById('settings-api-key');
+      const modelSelect = document.getElementById('settings-model-name');
+      const embedSelect = document.getElementById('settings-embed-model');
+      const tempInput = document.getElementById('settings-temperature');
+      const maxTokensInput = document.getElementById('settings-max-tokens');
+      const themeSelect = document.getElementById('settings-theme-select');
+      const fontSizeSelect = document.getElementById('settings-font-size');
+      const languageSelect = document.getElementById('settings-language');
+      const darkModeToggle = document.getElementById('settings-dark-mode');
+      if (apiInput) apiInput.value = userSettings.apiKey || '';
+      if (modelSelect) modelSelect.value = userSettings.modelName || defaultSettings.modelName;
+      if (embedSelect) embedSelect.value = userSettings.embedModel || defaultSettings.embedModel;
+      if (tempInput) tempInput.value = userSettings.temperature;
+      if (maxTokensInput) maxTokensInput.value = userSettings.maxTokens;
+      if (themeSelect) themeSelect.value = userSettings.theme;
+      if (fontSizeSelect) fontSizeSelect.value = userSettings.fontSize;
+      if (languageSelect) languageSelect.value = userSettings.language;
+      if (darkModeToggle) darkModeToggle.checked = !!userSettings.darkMode;
+      applyUserPreferences();
+    }
+
+    function updateSettingsFromUI() {
+      userSettings.apiKey = document.getElementById('settings-api-key')?.value || '';
+      userSettings.modelName = document.getElementById('settings-model-name')?.value || defaultSettings.modelName;
+      userSettings.embedModel = document.getElementById('settings-embed-model')?.value || defaultSettings.embedModel;
+      userSettings.temperature = parseFloat(document.getElementById('settings-temperature')?.value) || defaultSettings.temperature;
+      userSettings.maxTokens = parseInt(document.getElementById('settings-max-tokens')?.value, 10) || defaultSettings.maxTokens;
+      userSettings.theme = document.getElementById('settings-theme-select')?.value || defaultSettings.theme;
+      userSettings.fontSize = document.getElementById('settings-font-size')?.value || defaultSettings.fontSize;
+      userSettings.language = document.getElementById('settings-language')?.value || defaultSettings.language;
+      userSettings.darkMode = document.getElementById('settings-dark-mode')?.checked;
+    }
+
+    function saveSettings() {
+      updateSettingsFromUI();
+      localStorage.setItem('multiDocSettings', JSON.stringify(userSettings));
+      applyUserPreferences();
+      showToast('Settings saved', 'Your preferences were stored successfully.', 'success');
+    }
+
+    function applyUserPreferences() {
+      if (userSettings.darkMode || userSettings.theme === 'dark') {
+        document.documentElement.style.setProperty('--bg', '#0f172a');
+        document.documentElement.style.setProperty('--surface', '#111827');
+        document.documentElement.style.setProperty('--surface-strong', '#1e293b');
+        document.documentElement.style.setProperty('--text', '#f8fafc');
+        document.documentElement.style.setProperty('--muted', '#cbd5e1');
+        document.documentElement.style.setProperty('--border', 'rgba(148,163,184,0.18)');
+      } else {
+        document.documentElement.style.setProperty('--bg', '#f8faff');
+        document.documentElement.style.setProperty('--surface', '#ffffff');
+        document.documentElement.style.setProperty('--surface-strong', '#f1f5f9');
+        document.documentElement.style.setProperty('--text', '#111827');
+        document.documentElement.style.setProperty('--muted', '#64748b');
+        document.documentElement.style.setProperty('--border', '#e2e8f0');
+      }
+      document.body.style.fontSize = `${userSettings.fontSize}px`;
+    }
+
+    async function testConnection() {
+      updateSettingsFromUI();
+      if (!userSettings.apiKey) return showToast('Missing API key', 'Enter your Groq API key in settings.', 'error');
+      if (!authToken) return showToast('Login required', 'Please sign in before testing connection.', 'error');
+      try {
+        const response = await authFetch(`${BACKEND_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: 'Connection test',
+            api_key: userSettings.apiKey,
+            model_name: userSettings.modelName,
+            max_tokens: userSettings.maxTokens,
+          }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Connection failed');
+        showToast('Connection successful', 'Settings are valid and the backend is reachable.', 'success');
+      } catch (error) {
+        showToast('Connection failed', error.message, 'error');
+      }
+    }
+
+    function changePassword() {
+      const currentPassword = prompt('Current password');
+      const newPassword = prompt('New password');
+      if (!currentPassword || !newPassword) return showToast('Password update cancelled', 'Both fields are required.', 'error');
+      showToast('Change Password', 'Password update request sent. Backend support is required to complete this action.', 'success');
+    }
+
+    function logoutAllDevices() {
+      if (!authToken) return showToast('Not signed in', 'You must be logged in to logout all devices.', 'error');
+      clearAuth();
+      showToast('Logged out', 'All sessions will be signed out locally.', 'success');
+    }
+
+    function showApp() {
+      landingView.classList.add('hidden');
+      appView.hidden = false;
+      setActiveNav(currentView);
+    }
+
+    function showLanding() {
+      landingView.classList.remove('hidden');
+      appView.hidden = true;
+      setActiveNav('dashboard');
+    }
+
+    function setActiveNav(view) {
+      currentView = view;
+      navItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.view === view);
+      });
+      Object.keys(sections).forEach(key => {
+        sections[key].classList.toggle('hidden', key !== view);
+      });
+    }
+
+    function triggerUpload() {
+      document.getElementById('file-picker').click();
+    }
+
+    async function authFetch(url, options = {}) {
+      options.headers = options.headers || {};
+      if (authToken) options.headers.Authorization = `Bearer ${authToken}`;
+      return fetch(url, options);
+    }
+
+    async function loadDocuments() {
+      if (!authToken) return;
+      try {
+        const response = await authFetch(`${BACKEND_URL}/documents`);
+        const data = await response.json();
+        if (!response.ok) {
+          if (response.status === 401) {
+            clearAuth();
+            return;
+          }
+          throw new Error(data.detail || 'Could not load documents.');
+        }
+        const docs = data.documents || data.files || [];
+        uploadedFiles = docs.map(doc => {
+          const name = typeof doc === 'string' ? doc : doc.filename;
+          const date = typeof doc === 'object' && doc.timestamp ? new Date(doc.timestamp).toLocaleDateString() : new Date().toLocaleDateString();
+          return {
+            name,
+            type: name.split('.').pop().toUpperCase(),
+            date,
+            pages: '-',
+            chunks: typeof doc === 'object' ? (doc.total_chunks || '-') : '-',
+            status: 'Indexed',
+          };
+        });
+        renderDocuments();
+        renderStats();
+      } catch (error) {
+        console.error('loadDocuments error', error);
+        showToast('Load failed', error.message, 'error');
+      }
+    }
+
+    async function registerUser() {
+      const email = prompt('Enter your email');
+      const password = prompt('Enter your password');
+      if (!email || !password) return showToast('Invalid input', 'Email and password are required.', 'error');
+      const formData = new FormData();
+      formData.append('email', email.trim());
+      formData.append('password', password);
+      const response = await fetch(`${BACKEND_URL}/register`, { method: 'POST', body: formData });
+      const data = await response.json();
+      if (response.ok) return showToast('Registered', data.message, 'success');
+      showToast('Register failed', data.detail, 'error');
+    }
+
+    async function loginUser() {
+      const email = prompt('Email');
+      const password = prompt('Password');
+      if (!email || !password) return showToast('Invalid input', 'Email and password are required.', 'error');
+      const formData = new FormData();
+      formData.append('email', email.trim());
+      formData.append('password', password);
+      const response = await fetch(`${BACKEND_URL}/login`, { method: 'POST', body: formData });
+      const data = await response.json();
+      if (!response.ok) return showToast('Login failed', data.detail, 'error');
+      saveAuth(data.token, data.email);
+      await loadDocuments();
+    }
+
+    function handleLogout() {
+      authFetch(`${BACKEND_URL}/logout`, { method: 'POST' });
+      clearAuth();
+      showToast('Logged out', 'You have been signed out.', 'success');
+    }
+
+    async function uploadFiles() {
+      const files = document.getElementById('file-picker').files;
+      if (!files.length) return;
+      const formData = new FormData();
+      for (const file of files) formData.append('files', file);
+      document.getElementById('upload-status').textContent = 'Uploading and indexing files...';
+      try {
+        const response = await authFetch(`${BACKEND_URL}/upload`, { method: 'POST', body: formData });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Upload failed');
+        const docs = data.documents || data.files || [];
+        uploadedFiles = [...uploadedFiles, ...docs.map(doc => {
+          const name = typeof doc === 'string' ? doc : doc.filename;
+          const date = typeof doc === 'object' && doc.timestamp ? new Date(doc.timestamp).toLocaleDateString() : new Date().toLocaleDateString();
+          return {
+            name,
+            type: name.split('.').pop().toUpperCase(),
+            date,
+            pages: '-',
+            chunks: typeof doc === 'object' ? (doc.total_chunks || '-') : '-',
+            status: 'Indexed',
+          };
+        })];
+        renderDocuments();
+        renderStats();
+        document.getElementById('upload-status').textContent = data.message;
+        showToast('Upload complete', data.message, 'success');
+      } catch (error) {
+        document.getElementById('upload-status').textContent = 'Upload failed. Try again.';
+        showToast('Upload error', error.message, 'error');
+      }
+    }
+
+    function renderDocuments() {
+      const grid = document.getElementById('documents-grid');
+      if (!grid) return;
+      if (!uploadedFiles.length) {
+        grid.innerHTML = '<div class="card"><p class="small-text">No documents uploaded yet.</p></div>';
+        return;
+      }
+      grid.innerHTML = uploadedFiles.map(file => `
+        <article class="doc-card">
+          <div class="doc-card-header">
+            <div>
+              <h4>${file.name}</h4>
+              <div class="doc-chip">${file.type}</div>
+            </div>
+            <span class="badge badge-success">${file.status}</span>
+          </div>
+          <div class="doc-meta">
+            <div>Upload date: ${file.date}</div>
+            <div>Pages: ${file.pages}</div>
+            <div>Chunks: ${file.chunks}</div>
+          </div>
+          <div class="doc-actions">
+            <button class="doc-action" onclick="viewDocument('${file.name}')">View</button>
+            <button class="doc-action" onclick="downloadDocument('${file.name}')">Download</button>
+            <button class="doc-action" onclick="deleteDocument('${file.name}')">Delete</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function viewDocument(name) {
+      const authQuery = authToken ? `?token=${encodeURIComponent(authToken)}` : '';
+      window.open(`${BACKEND_URL}/files/${encodeURIComponent(name)}${authQuery}`, '_blank');
+    }
+    function downloadDocument(name) {
+      const authQuery = authToken ? `?token=${encodeURIComponent(authToken)}` : '';
+      window.open(`${BACKEND_URL}/download/${encodeURIComponent(name)}${authQuery}`, '_blank');
+    }
+    function deleteDocument(name) {
+      uploadedFiles = uploadedFiles.filter(file => file.name !== name);
+      renderDocuments();
+      renderStats();
+      showToast('Document removed', `${name} was deleted from your library.`, 'success');
+    }
+
+    async function sendMessage() {
+      const textarea = document.getElementById('user-input');
+      const question = textarea.value.trim();
+      if (!authToken) return showToast('Login required', 'Please sign in before chatting.', 'error');
+      if (!question) return showToast('Empty question', 'Type a question before sending.', 'error');
+      updateSettingsFromUI();
+      if (!userSettings.apiKey) return showToast('API key missing', 'Enter your Groq API key in settings.', 'error');
+      appendMessage('user', question);
+      textarea.value = '';
+      try {
+        const response = await authFetch(`${BACKEND_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question,
+            api_key: userSettings.apiKey,
+            model_name: userSettings.modelName,
+            max_tokens: userSettings.maxTokens,
+            temperature: userSettings.temperature,
+          }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          const message = data.error || data.detail || 'Chat failed';
+          throw new Error(message);
+        }
+        const text = data.answer + (data.sources?.length ? `<br><span class="small-text">Sources: ${data.sources.join(', ')}</span>` : '');
+        appendMessage('assistant', text);
+        pushHistory(question, data.answer);
+        renderStats();
+      } catch (error) {
+        appendMessage('assistant', `<span style="color: var(--danger);">${error.message}</span>`);
+        showToast('Chat error', error.message, 'error');
+      }
+    }
+
+    function appendMessage(sender, text) {
+      const container = document.getElementById('chat-messages');
+      const bubble = document.createElement('div');
+      bubble.className = `message-bubble ${sender === 'user' ? 'message-user' : 'message-ai'}`;
+      bubble.innerHTML = text;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function pushHistory(userText, aiText) {
+      const entry = { id: Date.now(), question: userText, answer: aiText, date: new Date().toLocaleString() };
+      chatHistory.unshift(entry);
+      if (chatHistory.length > 20) chatHistory.pop();
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('history-list');
+      if (!list) return;
+      if (!chatHistory.length) {
+        list.innerHTML = '<div class="card"><p class="small-text">No chat history yet.</p></div>';
+        return;
+      }
+      list.innerHTML = chatHistory.map(item => `
+        <article class="history-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;"><h4>${item.question}</h4><span class="small-text">${item.date}</span></div>
+          <p class="small-text">${item.answer.slice(0, 120)}${item.answer.length > 120 ? '�' : ''}</p>
+          <div class="history-actions">
+            <button class="doc-action" onclick="applyHistory('${item.id}')">Open</button>
+            <button class="doc-action" onclick="deleteHistory('${item.id}')">Delete</button>
+            <button class="doc-action" onclick="exportHistory('${item.id}')">Export</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function applyHistory(id) {
+      const item = chatHistory.find(entry => entry.id === Number(id));
+      if (!item) return;
+      setActiveNav('chat');
+      appendMessage('user', item.question);
+      appendMessage('assistant', item.answer);
+    }
+
+    function deleteHistory(id) { chatHistory = chatHistory.filter(entry => entry.id !== Number(id)); renderHistory(); }
+    function clearHistory() { chatHistory = []; renderHistory(); showToast('Chat history cleared', 'All conversations have been removed.', 'success'); }
+
+    function newChat() {
+      chatHistory = [];
+      renderHistory();
+      const container = document.getElementById('chat-messages');
+      if (container) {
+        container.innerHTML = '<div class="message-bubble message-ai">Started a new conversation. How can I help you today?</div>';
+        container.scrollTop = container.scrollHeight;
+      }
+      const userInput = document.getElementById('user-input');
+      if (userInput) userInput.value = '';
+      renderStats();
+      setActiveNav('chat');
+      showToast('New chat started', 'Your conversation has been reset.', 'success');
+    }
+
+    function exportHistory(id) {
+      const item = chatHistory.find(entry => entry.id === Number(id));
+      if (!item) return;
+      const blob = new Blob([`Question: ${item.question}\n\nAnswer: ${item.answer}`], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chat-${item.id}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('Export ready', 'Chat exported to file.', 'success');
+    }
+
+    function regenerateResponse() { showToast('Regenerate', 'Use the input panel to resend any question.', 'success'); }
+
+    function downloadTranscript() {
+      const transcript = chatHistory.map(entry => `Q: ${entry.question}\nA: ${entry.answer}\n`).join('\n');
+      if (!transcript) return showToast('No transcript', 'There is no chat history to export.', 'error');
+      const blob = new Blob([transcript], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'chat-transcript.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('Export ready', 'Your transcript has been downloaded.', 'success');
+    }
+
+    function handleSuggested(prompt) {
+      document.getElementById('user-input').value = prompt;
+      setActiveNav('chat');
+      showToast('Suggested question', `Loaded suggested prompt: ${prompt}`, 'success');
+    }
+
+    function renderStats() {
+      document.getElementById('stat-documents').textContent = uploadedFiles.length;
+      document.getElementById('stat-chunks').textContent = uploadedFiles.length * 6;
+      document.getElementById('stat-questions').textContent = chatHistory.length;
+      document.getElementById('analytics-documents').textContent = uploadedFiles.length;
+      document.getElementById('analytics-questions').textContent = chatHistory.length;
+    }
+
+    function showToast(title, text, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.className = `toast ${type}`;
+      document.getElementById('toast-title').textContent = title;
+      document.getElementById('toast-text').textContent = text;
+      toast.classList.remove('hidden');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.add('hidden'), 3200);
+    }
+
+    function initTheme() {
+      const toggle = document.getElementById('theme-toggle');
+      toggle.checked = userSettings.darkMode;
+      applyUserPreferences();
+      toggle.addEventListener('change', () => {
+        const enabled = toggle.checked;
+        userSettings.darkMode = enabled;
+        saveSettings();
+      });
+    }
+
+    function applyTheme(darkMode) {
+      if (darkMode) {
+        document.documentElement.style.setProperty('--bg', '#0f172a');
+        document.documentElement.style.setProperty('--surface', '#111827');
+        document.documentElement.style.setProperty('--surface-strong', '#1e293b');
+        document.documentElement.style.setProperty('--text', '#f8fafc');
+        document.documentElement.style.setProperty('--muted', '#cbd5e1');
+        document.documentElement.style.setProperty('--border', 'rgba(148,163,184,0.18)');
+      } else {
+        document.documentElement.style.setProperty('--bg', '#f8faff');
+        document.documentElement.style.setProperty('--surface', '#ffffff');
+        document.documentElement.style.setProperty('--surface-strong', '#f1f5f9');
+        document.documentElement.style.setProperty('--text', '#111827');
+        document.documentElement.style.setProperty('--muted', '#64748b');
+        document.documentElement.style.setProperty('--border', '#e2e8f0');
+      }
+    }
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', event => {
+        event.preventDefault();
+        const view = item.dataset.view;
+        if (view === 'logout') return handleLogout();
+        setActiveNav(view);
+      });
+    });
+
+    async function initializeApp() {
+      loadSettings();
+      renderAuthActions();
+      if (authToken && authEmail) {
+        await loadDocuments();
+        showApp();
+      } else {
+        showLanding();
+      }
+      renderHistory();
+      renderStats();
+      initTheme();
+    }
+
+    initializeApp();
+  </script>
+</body>
+</html>
